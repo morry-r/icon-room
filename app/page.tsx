@@ -5,6 +5,7 @@ import { IconGrid } from "@/components/icon-grid";
 import { Sidebar } from "@/components/sidebar";
 import { Icon, Category } from "@/lib/types";
 import { getIcons, getCategories } from "@/lib/api";
+import { Header } from "@/components/header";
 
 export default function Home() {
   const [icons, setIcons] = useState<Icon[]>([]);
@@ -32,12 +33,8 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b">
-        <div className="container flex h-16 items-center px-4">
-          <h1 className="text-xl font-bold">Icon Room</h1>
-        </div>
-      </header>
-      <div className="flex flex-1">
+      <Header />
+      <div className="flex flex-1 mt-16 bg-[#EEE]">
         <div className="w-64 border-r p-4">
           <Sidebar
             categories={categories}

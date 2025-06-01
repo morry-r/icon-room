@@ -345,7 +345,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
     <div className="flex min-h-screen flex-col bg-[#EEE]">
       <Header />
 
-      <div className="container mx-10 py-8">
+      <div className="container mt-16 mx-10 py-8">
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* 左側: アイコン表示 */}
@@ -383,7 +383,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                         __html: updatedSvgContent ? 
                           updatedSvgContent
                             .replace('<svg', '<svg style="width: 80%; height: 80%;"')
-                            .replace('viewBox="', `viewBox="0 0 ${icon["svg-image"].width} ${icon["svg-image"].height}" preserveAspectRatio="xMidYMid meet"`) : 
+                            .replace('viewBox="', `viewBox="0 0 ${icon["svg-image"].width+100} ${icon["svg-image"].height+100}" preserveAspectRatio="xMidYMid meet"`) : 
                           "",
                       }}
                       style={{
@@ -401,10 +401,9 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
 
             {/* 右側: 編集コントロール */}
             <div className="space-y-6">
-              {/* <h2 className="text-xl font-semibold">アイコンの編集</h2> */}
-              <div className="space-y-6">
+              <div className="space-y-9">
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Lato']">
+                  <label className="block text-base tracking-wider font-medium mb-2 font-['Lato']">
                     Width
                   </label>
                   <div className="flex items-center gap-4">
@@ -425,14 +424,14 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                         disabled={isLoading || !!error}
                       />
                     </div>
-                    <div className="rounded-lg bg-white border border-gray-200">
+                    <div className="rounded-lg bg-white">
                       <Input
                         type="number"
                         min="1"
                         max={icon["max-stroke-width"]}
                         value={strokeWidth}
                         onChange={(e) => handleStrokeWidthChange(e.target.value)}
-                        className="w-20 text-center"
+                        className="w-20 text-center border-0"
                         disabled={isLoading || !!error}
                       />
                     </div>
@@ -440,7 +439,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Lato']">
+                  <label className="block text-base tracking-wider font-medium mb-2 font-['Lato']">
                     Color
                   </label>
                   <div className="space-y-4">
@@ -458,7 +457,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                           disabled={isLoading || !!error}
                         />
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
                         <span className="text-gray-500">#</span>
                         <input
                           type="text"
@@ -485,7 +484,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2 font-['Lato']">
+                  <label className="block text-base tracking-wider font-medium mb-2 font-['Lato']">
                     Size(PNG)
                   </label>
                   <div className="flex">
@@ -543,11 +542,11 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
 
                 {/* // コンポーネントのレンダリング部分 (SVGコード表示部分) */}
                 <div className="mt-4">
-                  <label className="block text-sm font-medium mb-2 font-['Lato']">
+                  <label className="block text-base tracking-wider font-medium mb-2 font-['Lato']">
                     SVGコード
                   </label>
                   <div className="relative">
-                    <div className="p-4 rounded-lg overflow-x-auto text-sm max-h-[100px]" style={{
+                    <div className="p-4 rounded-lg overflow-x-auto text-base tracking-wider max-h-[100px]" style={{
                       background: "#333",
                       boxShadow: "inset 3px 3px 5px rgba(0, 0, 0, .3), inset -3px -3px 5px rgba(255, 255, 255, 0.1)",
                       borderRadius: "10px",
@@ -556,9 +555,9 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                       <code className="whitespace-nowrap">{getSingleLineSvg(updatedSvgContent)}</code>
                     </div>
                     <Button
-                      variant="outline"
+                      variant="default"
                       size="sm"
-                      className="absolute top-2 right-2"
+                      className="absolute top-2 right-2 rounded-[5px] bg-white hover:bg-gray-100"
                       onClick={handleCopyClick}
                     >
                       {copyButtonText}
