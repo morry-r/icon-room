@@ -135,12 +135,14 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
     if (!svgContent) return "";
     
     // SVGのスタイルを更新
-    let updatedSvg = svgContent;
+
+    let updatedSvg = svgContent
+      .replace('<?xml version="1.0" encoding="utf-8"?>', '') // XML宣言を削除
+      .replace('<path', '<!--!Icon Room by @iconroom - Copyright 2025 Icon Room. All rights reserved.--><path'); // コピーライトを追加
 
     // path要素にfillとstroke-widthの属性を追加または更新
     updatedSvg = updatedSvg.replace(/<path[^>]*>/g, (match) => {
       let updatedPath = match;
-      console.log(updatedPath);
       
       // fill属性の追加または更新
       if (icon["fill-flg"]) {
@@ -156,7 +158,6 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
           updatedPath = updatedPath.replace('<path', '<path fill="none"');
         }
       }
-      console.log(updatedPath);
 
       // stroke属性の追加または更新
       if (updatedPath.includes('stroke=')) {
@@ -164,7 +165,6 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
       } else {
         updatedPath = updatedPath.replace('<path', `<path stroke="${iconColor}"`);
       }
-      console.log(updatedPath);
 
       // stroke-width属性の追加または更新
       if (updatedPath.includes('stroke-width=')) {
@@ -179,30 +179,25 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
       return updatedPath;
     });
 
-    // SVGのサイズを取得
-    const svgWidth = icon["svg-image"].width;
-    const svgHeight = icon["svg-image"].height;
-
-    // 線幅が50pxまで太くできるように余白を設ける
-    const padding = 100; // 余白のサイズ
-    const viewBoxValue = `-${padding/2} -${padding/2} ${svgWidth + padding} ${svgHeight + padding}`;
-    updatedSvg = updatedSvg.replace(/viewBox="[^"]*"/, `viewBox="${viewBoxValue}" preserveAspectRatio="xMidYMid meet"`);
-    
-    // SVGタグにスタイルを追加
-    return updatedSvg.replace(
-      '<svg',
-      '<svg style="width: 100%; height: 100%;"'
-    );
+    return updatedSvg;
   };
 
-  const handleDownload = () => {
+  const handlePNGDownload = () => {
     try {
       if (!svgContent) {
         throw new Error("SVGの内容が見つかりません");
       }
 
       // 編集されたSVGを生成
-      const editedSvg = generateEditedSvg();
+      const editedSvg = generateEditedSvg()
+        .replace(/\/\/>/g, '/>');
+      
+      // SVGの内容を検証
+      if (!editedSvg.includes('<svg') || !editedSvg.includes('</svg>')) {
+        console.error("Invalid SVG content:", editedSvg);
+        setError("SVGの内容が不正です");
+        return;
+      }
 
       // 一時的なCanvasを作成
       const canvas = document.createElement('canvas');
@@ -218,19 +213,29 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
 
       // SVGを画像として読み込み
       const img = new Image();
+      
       img.onload = () => {
-        // Canvasに描画
-        ctx.drawImage(img, 0, 0, size, size);
-        
-        // PNGとしてダウンロード
-        const pngUrl = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = pngUrl;
-        link.download = `${icon.name}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        try {
+          ctx.drawImage(img, 0, 0, size, size);
+          
+          // PNGとしてダウンロード
+          const pngUrl = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.href = pngUrl;
+          link.download = `${icon.name}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+        } catch (error) {
+          console.error("Canvasへの描画中にエラーが発生しました:", error);
+          setError("画像の生成に失敗しました");
+        }
+      };
+      img.onerror = (error) => {
+        console.error("画像の読み込み中にエラーが発生しました:", error);
+        console.error("SVG Content:", editedSvg);
+        setError("画像の読み込みに失敗しました");
       };
       img.src = url;
     } catch (error) {
@@ -239,63 +244,6 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
     }
   };
   
-  // SVGをシンプルな形式に変換する関数
-  const simplifyAndCleanSvg = (svgContent: string | null, color: string, strokeWidth: number): string => {
-    if (!svgContent) return "";
-    
-    try {
-      // 基本的なSVG構造をパース
-      let cleaned = svgContent;
-      
-      // viewBox属性を抽出
-      const viewBoxMatch = cleaned.match(/viewBox="([^"]+)"/);
-      const viewBox = viewBoxMatch ? viewBoxMatch[1] : "0 0 24 24"; // デフォルト値
-      
-      // パスやその他の図形要素を抽出
-      const pathMatch = cleaned.match(/<path[^>]*>/g) || [];
-      const circleMatch = cleaned.match(/<circle[^>]*>/g) || [];
-      const rectMatch = cleaned.match(/<rect[^>]*>/g) || [];
-      const lineMatch = cleaned.match(/<line[^>]*>/g) || [];
-      const polylineMatch = cleaned.match(/<polyline[^>]*>/g) || [];
-      const polygonMatch = cleaned.match(/<polygon[^>]*>/g) || [];
-      
-      // すべての図形要素を集める
-      const allShapes = [
-        ...pathMatch, 
-        ...circleMatch, 
-        ...rectMatch, 
-        ...lineMatch, 
-        ...polylineMatch, 
-        ...polygonMatch
-      ];
-      
-      // クラスを使用している属性を置き換え
-      const shapesWithUpdatedStyle = allShapes.map(shape => {
-        // クラス参照を直接スタイルに置き換え
-        return shape
-          .replace(/class="[^"]*"/g, '')
-          .replace(/stroke="[^"]*"/g, `stroke="${color}"`)
-          .replace(/stroke-width="[^"]*"/g, `stroke-width="${strokeWidth}"`)
-          .replace(/fill="[^"]*"/g, 'fill="none"');
-      });
-      
-      // 新しいSVG構造を作成
-      const simplifiedSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="none" stroke="${color}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">${shapesWithUpdatedStyle.join('')}</svg>`;
-      console.log(simplifiedSvg);
-      // 空白を整理して1行に
-      return simplifiedSvg.replace(/\s+/g, ' ').trim();
-    } catch (error) {
-      console.error("SVG簡略化エラー:", error);
-      return svgContent?.replace(/\s+/g, ' ').trim() || "";
-    }
-  };
-
-  // 更新されたSVG変換とダウンロード処理
-  const generateSimplifiedSvg = () => {
-    if (!svgContent) return "";
-    return simplifyAndCleanSvg(svgContent, iconColor, strokeWidth);
-  };
-  // SVGダウンロード処理の更新
   const handleSVGDownload = () => {
     try {
       if (!svgContent) {
@@ -355,7 +303,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
               </div>
 
               <div 
-                className="rounded-lg p-8 flex items-center justify-center"
+                className="rounded-lg p-6 flex items-center justify-center"
                 style={{ 
                   width: "100%", 
                   maxWidth: "500px",
@@ -376,14 +324,13 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                     {error}
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center h-full w-full bg-secondary rounded-lg p-4">
+                  <div className="flex items-center justify-center h-full w-full bg-secondary rounded-lg">
                     <div
                       className="w-full h-full flex items-center justify-center"
                       dangerouslySetInnerHTML={{
                         __html: updatedSvgContent ? 
                           updatedSvgContent
-                            .replace('<svg', '<svg style="width: 80%; height: 80%;"')
-                            .replace('viewBox="', `viewBox="0 0 ${icon["svg-image"].width+100} ${icon["svg-image"].height+100}" preserveAspectRatio="xMidYMid meet"`) : 
+                            .replace(/viewBox="[^"]*"/, `viewBox="-50 -50 ${icon["svg-image"].width+100} ${icon["svg-image"].height+100}" preserveAspectRatio="xMidYMid meet"`) : 
                           "",
                       }}
                       style={{
@@ -517,7 +464,7 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
 
                 <div className="flex gap-2">
                   <Button
-                    onClick={handleDownload}
+                    onClick={handlePNGDownload}
                     disabled={isLoading || !!error}
                     className="flex-1 backdrop-blur-md border border-blue-200/20 shadow-lg text-blue-900"
                     style={{
