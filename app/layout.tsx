@@ -11,7 +11,7 @@ const lato = Lato({
 });
 
 export const metadata: Metadata = {
-  title: 'IconVault - Free Icon Distribution',
+  title: 'Icon Room - Free Icon Distribution',
   description: 'Download and customize beautiful icons for your projects',
 };
 

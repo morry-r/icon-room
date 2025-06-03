@@ -133,53 +133,34 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
 
   const generateEditedSvg = () => {
     if (!svgContent) return "";
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgContent, 'image/svg+xml');
+    const svg = doc.documentElement;
     
-    // SVGのスタイルを更新
-
-    let updatedSvg = svgContent
-      .replace('<?xml version="1.0" encoding="utf-8"?>', '') // XML宣言を削除
-      .replace('<path', '<!--!Icon Room by @iconroom - Copyright 2025 Icon Room. All rights reserved.--><path'); // コピーライトを追加
-
-    // path要素にfillとstroke-widthの属性を追加または更新
-    updatedSvg = updatedSvg.replace(/<path[^>]*>/g, (match) => {
-      let updatedPath = match;
-      
-      // fill属性の追加または更新
-      if (icon["fill-flg"]) {
-        if (updatedPath.includes('fill=')) {
-          updatedPath = updatedPath.replace(/fill="[^"]*"/, `fill="${iconColor}"`);
-        } else {
-          updatedPath = updatedPath.replace('<path', `<path fill="${iconColor}"`);
-        }
-      } else {
-        if (updatedPath.includes('fill=')) {
-          updatedPath = updatedPath.replace(/fill="[^"]*"/, 'fill="none"');
-        } else {
-          updatedPath = updatedPath.replace('<path', '<path fill="none"');
-        }
-      }
-
-      // stroke属性の追加または更新
-      if (updatedPath.includes('stroke=')) {
-        updatedPath = updatedPath.replace(/stroke="[^"]*"/, `stroke="${iconColor}"`);
-      } else {
-        updatedPath = updatedPath.replace('<path', `<path stroke="${iconColor}"`);
-      }
-
-      // stroke-width属性の追加または更新
-      if (updatedPath.includes('stroke-width=')) {
-        updatedPath = updatedPath.replace(/stroke-width="[^"]*"/, `stroke-width="${strokeWidth}"`);
-      } else {
-        updatedPath = updatedPath.replace('<path', `<path stroke-width="${strokeWidth}"`);
-      }
-
-      // パスタグの閉じ方を修正
-      updatedPath = updatedPath.replace('>', '/>');
-
-      return updatedPath;
+    // viewBoxの形式を固定
+    svg.setAttribute('viewBox', '0 0 500 500');
+    
+    // 幅と高さを設定
+    svg.setAttribute('width', iconSize.toString());
+    svg.setAttribute('height', iconSize.toString());
+    
+    // コピーライトコメントを追加
+    const comment = doc.createComment('Icon Room by @iconroom - Copyright 2025 Icon Room. All rights reserved.');
+    svg.insertBefore(comment, svg.firstChild);
+    
+    // 色を設定
+    const paths = svg.querySelectorAll('path');
+    paths.forEach(path => {
+      path.setAttribute('fill', iconColor);
+      path.setAttribute('stroke', iconColor);
     });
-
-    return updatedSvg;
+    
+    // 線の太さを設定（ユーザーが変更した値を使用）
+    paths.forEach(path => {
+      path.setAttribute('stroke-width', strokeWidth.toString());
+    });
+    console.log(new XMLSerializer().serializeToString(svg));
+    return new XMLSerializer().serializeToString(svg);
   };
 
   const handlePNGDownload = () => {
@@ -330,8 +311,8 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
                       dangerouslySetInnerHTML={{
                         __html: updatedSvgContent ? 
                           updatedSvgContent
-                            .replace(/viewBox="[^"]*"/, `viewBox="-50 -50 ${icon["svg-image"].width+100} ${icon["svg-image"].height+100}" preserveAspectRatio="xMidYMid meet"`) : 
-                          "",
+                            // .replace(/viewBox="[^"]*"/, `viewBox="-50 -50 ${icon["svg-image"].width+100} ${icon["svg-image"].height+100}" preserveAspectRatio="xMidYMid meet"`) : 
+                          :"",
                       }}
                       style={{
                         width: "100%",
