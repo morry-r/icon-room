@@ -2,28 +2,18 @@ export interface Icon {
   id: string;
   name: string;
   description: string;
-  category: {
-    id: string;
-    name: string;
-  };
-  tags: string[];
+  category: string | null;
+  tags: string[] | null;
   svg: string;
-  "svg-image": {
-    url: string;
-    height: number;
-    width: number;
-  };
-  "icon-image"?: {
-    url: string;
-    height: number;
-    width: number;
-  };
-  "fill-flg": boolean;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  revisedAt: string;
-  "max-stroke-width": number;
+  created_at: string;
+}
+
+export type IconVariant = {
+  id: string;
+  icon_id: string;
+  weight: 'small' | 'medium' | 'bold';
+  svg: string;
+  created_at: string;
 }
 
 export interface Category {

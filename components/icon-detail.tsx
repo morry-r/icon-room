@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Icon } from "@/lib/types";
+import { Icon, IconVariant } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { IconGrid } from "@/components/icon-grid";
@@ -10,10 +10,11 @@ import { Header } from "@/components/header";
 
 interface IconDetailProps {
   icon: Icon;
+  iconVariant: IconVariant;
   relatedIcons: Icon[];
 }
 
-export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
+export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps) {
   const [strokeWidth, setStrokeWidth] = useState(2);
   const [iconSize, setIconSize] = useState(200);
   const [iconColor, setIconColor] = useState("#000000");
@@ -39,18 +40,18 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
     // SVGの読み込み
     const loadSvgContent = async () => {
       try {
-        if (!icon["svg-image"]?.url) { //オプショナルチェイニングを使用している
+        if (!iconVariant["svg"]) { 
           throw new Error("SVG画像が見つかりません");
         }
 
-        const response = await fetch(icon["svg-image"].url);
-        if (!response.ok) {
-          throw new Error("SVGの読み込みに失敗しました");
-        }
+        // const response = await fetch(!iconVariant["svg"]);
+        // if (!response.ok) {
+        //   throw new Error("SVGの読み込みに失敗しました");
+        // }
 
-        const content = await response.text(); // レスポンスのボディをテキストとして取得
-        setSvgContent(content);
-        setError(null);
+        // const content = await response.text(); // レスポンスのボディをテキストとして取得
+        // setSvgContent(content);
+        // setError(null);
       } catch (err) {
         console.error("Error loading SVG:", err);
         setError(err instanceof Error ? err.message : "SVGの読み込みに失敗しました");
@@ -58,14 +59,8 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
     };
 
     loadSvgContent();
-  }, [icon["svg-image"]?.url]); //この値が変わった時に再レンダリングされる
+  }, [!iconVariant["svg"]]); //この値が変わった時に再レンダリングされる
 
-  const handleStrokeWidthChange = (value: string) => {
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 1 && num <= icon["max-stroke-width"]) {
-      setStrokeWidth(num);
-    }
-  };
 
   const handleIconSizeChange = (value: string) => {
     const num = parseInt(value, 10);
@@ -330,42 +325,6 @@ export function IconDetail({ icon, relatedIcons }: IconDetailProps) {
             {/* 右側: 編集コントロール */}
             <div className="space-y-6">
               <div className="space-y-9">
-                <div>
-                  <label className="block text-base tracking-wider font-medium mb-2 font-['Lato']">
-                    Width
-                  </label>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 p-2 rounded-lg" style={{
-                      background: "#EEE"
-                    }}>
-                      <input
-                        type="range"
-                        min="1"
-                        max={icon["max-stroke-width"]}
-                        value={strokeWidth}
-                        onChange={(e) => setStrokeWidth(Number(e.target.value))}
-                        className="w-full h-2 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:shadow-[2px_2px_4px_rgba(0,0,0,0.1),-2px_-2px_4px_rgba(255,255,255,0.7)]"
-                        style={{
-                          background: "linear-gradient(to right, #EEE, #CCC)",
-                          boxShadow: "inset 2px 2px 4px rgba(0, 0, 0, 0.1), inset -2px -2px 4px rgba(255, 255, 255, 0.7)"
-                        }}
-                        disabled={isLoading || !!error}
-                      />
-                    </div>
-                    <div className="rounded-lg bg-white">
-                      <Input
-                        type="number"
-                        min="1"
-                        max={icon["max-stroke-width"]}
-                        value={strokeWidth}
-                        onChange={(e) => handleStrokeWidthChange(e.target.value)}
-                        className="w-20 text-center border-0"
-                        disabled={isLoading || !!error}
-                      />
-                    </div>
-                  </div>
-                </div>
-
                 <div>
                   <label className="block text-base tracking-wider font-medium mb-2 font-['Lato']">
                     Color

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { IconGrid } from "@/components/icon-grid";
 import { Sidebar } from "@/components/sidebar";
 import { Icon, Category } from "@/lib/types";
-import { getIcons, getCategories } from "@/lib/api";
+import { fetchIconData } from "@/lib/data";
 import { Header } from "@/components/header";
 
 export default function Home() {
@@ -15,21 +15,21 @@ export default function Home() {
   // 初期処理
   // アイコンとカテゴリーを取得
   useEffect(() => {
-    const fetchData = async () => {
-      const [fetchedIcons, fetchedCategories] = await Promise.all([
-        getIcons(),
-        getCategories(),
-      ]);
-      setIcons(fetchedIcons);
-      setCategories(fetchedCategories);
-    };
-    fetchData();
+    // const fetchData = async () => {
+    //   const [fetchedIcons, fetchedCategories] = await Promise.all([
+    //     getIcons(),
+    //     getCategories(),
+    //   ]);
+    //   setIcons(fetchedIcons);
+    //   setCategories(fetchedCategories);
+    // };
+    // fetchData();
   }, []);
 
   // 選択されたカテゴリーに応じてフィルタリング
-  const filteredIcons = selectedCategory
-    ? icons.filter((icon) => icon.category.id === selectedCategory)
-    : icons;
+  // const filteredIcons = selectedCategory
+  //   ? icons.filter((icon) => icon.category.id === selectedCategory)
+  //   : icons;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -43,7 +43,7 @@ export default function Home() {
           />
         </div>
         <main className="flex-1 p-4">
-          <IconGrid icons={filteredIcons} />
+          {/* <IconGrid icons={filteredIcons} /> */}
         </main>
       </div>
     </div>
