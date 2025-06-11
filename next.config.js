@@ -11,6 +11,11 @@ const nextConfig = {
     MICROCMS_SERVICE_DOMAIN: process.env.MICROCMS_SERVICE_DOMAIN,
     MICROCMS_API_KEY: process.env.MICROCMS_API_KEY,
   },
+  experimental: {
+    serverActions: {
+      allowedOrigins: ['localhost:3000'],
+    },
+  },
 };
 
 module.exports = nextConfig;
