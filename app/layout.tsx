@@ -1,19 +1,8 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { Lato } from 'next/font/google';
+import { inter } from '@/components/ui/fonts';
 
-const inter = Inter({ subsets: ['latin'] });
-const lato = Lato({ 
-  weight: ['100', '300', '400', '700', '900'],
-  subsets: ["latin"],
-  variable: '--font-lato'
-});
 
-export const metadata: Metadata = {
-  title: 'Icon Room - Free Icon Distribution',
-  description: 'Download and customize beautiful icons for your projects',
-};
 
 export default function RootLayout({
   children,
@@ -22,7 +11,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={`${inter.className} ${lato.variable}`}>
+      <body className={`${inter.className}`}>
         {children}
       </body>
     </html>

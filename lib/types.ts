@@ -16,11 +16,19 @@ export type IconVariant = {
   created_at: string;
 }
 
+export type IconWithSvg = {
+  icon_id: string; 
+  slug: string;
+  name: string;          // icons.name
+  category_name: string | null; // icons.category（NULL許容）
+  tags: string[] | null; // icons.tags（NULL許容）
+  svg: string;           // icon_variants.svg
+};
+
 export interface Category {
   id: string;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  revisedAt: string;
   name: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
 } 

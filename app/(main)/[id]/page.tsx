@@ -14,4 +14,10 @@ export default async function IconPage({ params }: { params: { id: string } }) {
     console.error("Error loading icon page:", error);
     return notFound();
   }
+  return (
+    <div>
+      <h1>{params.id} Icons</h1>
+      {/* アイコン一覧の表示 */}
+    </div>
+  )
 } 

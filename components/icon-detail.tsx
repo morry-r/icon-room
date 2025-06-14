@@ -460,7 +460,7 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
             <h2 className="text-xl font-semibold mb-4">
               同じカテゴリのアイコン
             </h2>
-            <IconGrid icons={relatedIcons} />
+            {/* <IconGrid icons={relatedIcons} /> */}
           </div>
         </div>
       </div>
