@@ -1,5 +1,5 @@
 import { IconGrid } from "@/components/icon-grid";
-import { fetchIconData } from "@/lib/data";
+import { fetchIconListData } from "@/lib/data";
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function Page() {
 
-  const icons = await fetchIconData();
+  const icons = await fetchIconListData();
 
   return (
     <div className="w-screen border-r p-4">

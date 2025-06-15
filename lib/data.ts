@@ -1,44 +1,63 @@
 import postgres from 'postgres';
-import { IconWithSvg,Category } from './types';
+import { IconWithSvg, Category, CategoryName } from './types';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function fetchIconData() {
-    try {
-      console.log(process.env.POSTGRES_URL);
-      const data = await sql<IconWithSvg[]>`SELECT
-        icons.id AS icon_id,
-        icons.slug,
-        icons.name,
-        categories.name AS category_name,
-        ARRAY_AGG(DISTINCT tags.name) AS tag_names,
-        icon_variants.svg
-      FROM
-        icons
-      JOIN
-        icon_variants ON icons.id = icon_variants.icon_id
-      LEFT JOIN
-        categories ON icons.category_id = categories.id
-      LEFT JOIN
-        icon_tags ON icons.id = icon_tags.icon_id
-      LEFT JOIN
-        tags ON icon_tags.tag_id = tags.id
-      WHERE
-        icon_variants.weight = 'filled'
-      GROUP BY
-        icons.id,
-        icons.name,
-        categories.name,
-        icon_variants.svg;`;
+export async function fetchIconListData() {
+  try {
+    const data = await sql<IconWithSvg[]>`SELECT
+      icons.id AS icon_id,
+      icons.slug,
+      icons.name,
+      icon_variants.svg
+    FROM
+      icons
+    JOIN
+      icon_variants ON icons.id = icon_variants.icon_id
+    WHERE
+      icon_variants.weight = 'filled';`;
 
-      return data;
-    } catch (error) {
-      console.error('Database Error:', error);
-      throw new Error('Failed to fetch icon data.');
-    }
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
 }
+// export async function fetchIconDetailData() {
+//     try {
+//       const data = await sql<IconWithSvg[]>`SELECT
+//         icons.id AS icon_id,
+//         icons.slug,
+//         icons.name,
+//         categories.name AS category_name,
+//         ARRAY_AGG(DISTINCT tags.name) AS tag_names,
+//         icon_variants.svg
+//       FROM
+//         icons
+//       JOIN
+//         icon_variants ON icons.id = icon_variants.icon_id
+//       LEFT JOIN
+//         categories ON icons.category_id = categories.id
+//       LEFT JOIN
+//         icon_tags ON icons.id = icon_tags.icon_id
+//       LEFT JOIN
+//         tags ON icon_tags.tag_id = tags.id
+//       WHERE
+//         icon_variants.weight = 'filled'
+//       GROUP BY
+//         icons.id,
+//         icons.name,
+//         categories.name,
+//         icon_variants.svg;`;
 
-export async function fetchCategoryData() {
+//       return data;
+//     } catch (error) {
+//       console.error('Database Error:', error);
+//       throw new Error('Failed to fetch icon data.');
+//     }
+// }
+
+export async function fetchCategoryList() {
   try {
     console.log(process.env.POSTGRES_URL);
     const data = await sql<Category[]>`SELECT
@@ -54,6 +73,47 @@ export async function fetchCategoryData() {
     `;
 
     return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
+}
+export async function fetchIconsByCategory(slug: string) {
+  try {
+    const data = await sql<IconWithSvg[]>`SELECT
+      icons.id AS icon_id,
+      icons.slug,
+      icons.name,
+      icon_variants.svg
+    FROM
+      icons
+    JOIN
+      icon_variants ON icons.id = icon_variants.icon_id
+    JOIN
+      categories ON icons.category_id = categories.id
+    WHERE
+      icon_variants.weight = 'filled'
+      AND categories.slug = ${slug};`;
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
+}
+
+export async function fetchCategoryNameBySlug(slug: string) {
+  try {
+    const data = await sql<CategoryName[]>`SELECT
+      name
+    FROM
+      categories
+    WHERE
+      slug = ${slug};`;
+
+    const categoryName = data[0]?.name || slug;
+
+    return categoryName;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch icon data.');

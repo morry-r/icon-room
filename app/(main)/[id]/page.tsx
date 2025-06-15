@@ -1,5 +1,5 @@
 import { IconDetail } from "@/components/icon-detail";
-import { fetchIconData } from "@/lib/data";
+import { fetchIconListData } from "@/lib/data";
 import { notFound } from "next/navigation";
 
 export default async function IconPage({ params }: { params: { id: string } }) {

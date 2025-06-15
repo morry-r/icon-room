@@ -19,6 +19,13 @@ export type IconVariant = {
 export type IconWithSvg = {
   icon_id: string; 
   slug: string;
+  name: string;
+  svg: string;
+};
+
+export type IconDetail = {
+  icon_id: string; 
+  slug: string;
   name: string;          // icons.name
   category_name: string | null; // icons.category（NULL許容）
   tags: string[] | null; // icons.tags（NULL許容）
@@ -32,3 +39,7 @@ export interface Category {
   created_at: string;
   updated_at: string;
 } 
+
+export type CategoryName = {
+  name: string;
+}
