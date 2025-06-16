@@ -3,15 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
-import { Category } from '@/lib/types';
+import { Category, Tag } from '@/lib/types';
 
-export default function SidenavClient({ categories }: { categories: Category[] }) {
+export default function SidenavClient({ categories, tags }: { categories: Category[], tags: Tag[] }) {
   const pathname = usePathname();
 
 
   return (
     <div className="flex w-screen h-full flex-col px-3 py-4 md:px-2">
       <div className="flex grow flex-row space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+        <div className="flex flex-col space-y-2">カテゴリ</div>
 
         {categories.map((category) => (
             <Link
@@ -25,6 +26,26 @@ export default function SidenavClient({ categories }: { categories: Category[] }
               )}
             >
               {category.name}
+            </Link>
+          ))
+        }
+       
+      </div>
+      <div className="flex grow flex-row space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+        <div className="flex flex-col space-y-2">タグ</div>
+
+        {tags.map((tag) => (
+            <Link
+              key={tag.id}
+              href={`/icons/tag/${tag.slug}`}
+              className={clsx(
+                'flex h-10 grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-gray-100 md:flex-none md:justify-start md:p-2 md:px-3',
+                {
+                  'bg-sky-100 text-blue-600': pathname === `/icons/category/${tag.slug}`,
+                }
+              )}
+            >
+              {tag.name}
             </Link>
           ))
         }

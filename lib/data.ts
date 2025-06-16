@@ -1,5 +1,5 @@
 import postgres from 'postgres';
-import { IconWithSvg, Category, CategoryName } from './types';
+import { IconWithSvg, Category, CategoryName, Tag, TagName } from './types';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -139,3 +139,67 @@ export async function fetchCategoryNameBySlug(slug: string) {
 //     throw new Error('Failed to fetch total number of invoices.');
 //   }
 // }
+
+export async function fetchTagList() {
+  try {
+    console.log(process.env.POSTGRES_URL);
+    const data = await sql<Tag[]>`SELECT
+      id,
+      name,
+      slug,
+      created_at,
+      updated_at
+    FROM
+      tags
+    ORDER BY
+      name;`;
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
+}
+export async function fetchIconsByTag(slug: string) {
+  try {
+    const data = await sql<IconWithSvg[]>`SELECT
+      icons.id AS icon_id,
+      icons.slug,
+      icons.name,
+      icon_variants.svg
+    FROM
+      icons
+    JOIN
+      icon_variants ON icons.id = icon_variants.icon_id
+    JOIN
+      icon_tags ON icons.id = icon_tags.icon_id
+    JOIN
+      tags ON icon_tags.tag_id = tags.id
+    WHERE
+      icon_variants.weight = 'filled'
+      AND tags.slug = ${slug};`;
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
+}
+
+export async function fetchTagNameBySlug(slug: string) {
+  try {
+    const data = await sql<TagName[]>`SELECT
+      name
+    FROM
+      tags
+    WHERE
+      slug = ${slug};`;
+
+    const tagName = data[0]?.name || slug;
+
+    return tagName;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
+}

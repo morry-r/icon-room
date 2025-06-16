@@ -43,3 +43,14 @@ export interface Category {
 export type CategoryName = {
   name: string;
 }
+export interface Tag {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
+} 
+
+export type TagName = {
+  name: string;
+}
