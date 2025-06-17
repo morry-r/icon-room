@@ -4,24 +4,22 @@ import { useState, useEffect } from "react";
 import { Icon, IconVariant } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
-import { IconGrid } from "@/components/icon-grid";
 import { Input } from "@/components/ui/input";
 import { Header } from "@/components/header";
+import { IconDetail as IconDetailType } from "@/lib/types";
 
 interface IconDetailProps {
-  icon: Icon;
-  iconVariant: IconVariant;
-  relatedIcons: Icon[];
+  icon: IconDetailType[];
 }
 
-export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps) {
-  const [strokeWidth, setStrokeWidth] = useState(2);
-  const [iconSize, setIconSize] = useState(200);
+export function IconDetail({ icon }: IconDetailProps) {
   const [iconColor, setIconColor] = useState("#000000");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [svgContent, setSvgContent] = useState<string | null>(null);
   const [copyButtonText, setCopyButtonText] = useState("Copy");
+  const [iconSize, setIconSize] = useState(100);  // デフォルトサイズを100に設定
+
   const [recentColors, setRecentColors] = useState<string[]>(() => {
     // ブラウザ環境でのみローカルストレージを使用して色を設定
     if (typeof window !== 'undefined') {
@@ -40,7 +38,7 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
     // SVGの読み込み
     const loadSvgContent = async () => {
       try {
-        if (!iconVariant["svg"]) { 
+        if (!icon[0].svg) { 
           throw new Error("SVG画像が見つかりません");
         }
 
@@ -50,7 +48,7 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
         // }
 
         // const content = await response.text(); // レスポンスのボディをテキストとして取得
-        // setSvgContent(content);
+        setSvgContent(icon[0].svg);
         // setError(null);
       } catch (err) {
         console.error("Error loading SVG:", err);
@@ -59,15 +57,15 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
     };
 
     loadSvgContent();
-  }, [!iconVariant["svg"]]); //この値が変わった時に再レンダリングされる
+  }, [icon[0].svg]); // icon[0].svgが変わった時に再レンダリングされる
 
 
-  const handleIconSizeChange = (value: string) => {
-    const num = parseInt(value, 10);
-    if (!isNaN(num) && num >= 100 && num <= 300) {
-      setIconSize(num);
-    }
-  };
+  // const handleIconSizeChange = (value: string) => {
+  //   const num = parseInt(value, 10);
+  //   if (!isNaN(num) && num >= 100 && num <= 300) {
+  //     setIconSize(num);
+  //   }
+  // };
 
   const handleColorChange = (color: string) => {
     setIconColor(color);
@@ -150,11 +148,6 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
       path.setAttribute('stroke', iconColor);
     });
     
-    // 線の太さを設定（ユーザーが変更した値を使用）
-    paths.forEach(path => {
-      path.setAttribute('stroke-width', strokeWidth.toString());
-    });
-    console.log(new XMLSerializer().serializeToString(svg));
     return new XMLSerializer().serializeToString(svg);
   };
 
@@ -198,7 +191,7 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
           const pngUrl = canvas.toDataURL('image/png');
           const link = document.createElement('a');
           link.href = pngUrl;
-          link.download = `${icon.name}.png`;
+          link.download = `${icon[0].name}.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -236,7 +229,7 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
       // ダウンロードリンクを作成
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${icon.name}.svg`;
+      link.download = `${icon[0].name}.svg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -275,7 +268,7 @@ export function IconDetail({ icon, iconVariant, relatedIcons }: IconDetailProps)
             {/* 左側: アイコン表示 */}
             <div className="space-y-4 flex flex-col items-center">
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">{icon.name}</h1>
+                <h1 className="text-2xl font-bold">{icon[0].name}</h1>
               </div>
 
               <div 

@@ -1,4 +1,4 @@
-import { IconGrid } from "@/components/icon-grid";
+import { IconList } from "@/components/ui/icon-list";
 import { fetchIconListData } from "@/lib/data";
 import { Metadata } from 'next'
 
@@ -11,12 +11,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
+  const [filled, bold, thin] = await Promise.all([
+    fetchIconListData('filled'),
+    fetchIconListData('bold'),
+    fetchIconListData('thin'),
+  ])
 
-  const icons = await fetchIconListData();
-
-  return (
-    <div className="w-screen border-r p-4">
-      <IconGrid icons={icons} />
-    </div>  
-  );
+  return <IconList iconsByWeight={{ filled, bold, thin }} />
 }

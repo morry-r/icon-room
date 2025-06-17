@@ -1,7 +1,7 @@
 // app/(main)/icons/category/[slug]/page.tsx
 import { Metadata } from 'next'
 import { fetchIconsByCategory, fetchCategoryNameBySlug } from '@/lib/data'
-import { IconGrid } from "@/components/icon-grid";
+import { IconList } from "@/components/ui/icon-list";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const { categoryName } = await getCategoryName(params.slug)
@@ -13,16 +13,20 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function CategoryPage({ params }: { params: { slug: string } }) {
-  const icons = await fetchIconsByCategory(params.slug)
+  const [filled, bold, thin] = await Promise.all([
+    fetchIconsByCategory(params.slug, 'filled'),
+    fetchIconsByCategory(params.slug, 'bold'),
+    fetchIconsByCategory(params.slug, 'thin'),
+  ])
   const { categoryName } = await getCategoryName(params.slug)
 
   return (
     <div>
-      {icons.length > 0 ? (
+      {[filled, bold, thin].length > 0 ? (
         <>
           <h1>{categoryName} のアイコン一覧</h1>
           <div className="w-screen border-r p-4">
-            <IconGrid icons={icons} />
+            <IconList iconsByWeight={{ filled, bold, thin }} />
           </div>
         </>
       ) : (

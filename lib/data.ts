@@ -1,9 +1,9 @@
 import postgres from 'postgres';
-import { IconWithSvg, Category, CategoryName, Tag, TagName } from './types';
+import { IconWithSvg, Category, CategoryName, Tag, TagName, IconDetail } from './types';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
-export async function fetchIconListData() {
+export async function fetchIconListData(weight: string) {
   try {
     const data = await sql<IconWithSvg[]>`SELECT
       icons.id AS icon_id,
@@ -15,7 +15,7 @@ export async function fetchIconListData() {
     JOIN
       icon_variants ON icons.id = icon_variants.icon_id
     WHERE
-      icon_variants.weight = 'filled';`;
+      icon_variants.weight = ${weight};`;
 
     return data;
   } catch (error) {
@@ -23,39 +23,6 @@ export async function fetchIconListData() {
     throw new Error('Failed to fetch icon data.');
   }
 }
-// export async function fetchIconDetailData() {
-//     try {
-//       const data = await sql<IconWithSvg[]>`SELECT
-//         icons.id AS icon_id,
-//         icons.slug,
-//         icons.name,
-//         categories.name AS category_name,
-//         ARRAY_AGG(DISTINCT tags.name) AS tag_names,
-//         icon_variants.svg
-//       FROM
-//         icons
-//       JOIN
-//         icon_variants ON icons.id = icon_variants.icon_id
-//       LEFT JOIN
-//         categories ON icons.category_id = categories.id
-//       LEFT JOIN
-//         icon_tags ON icons.id = icon_tags.icon_id
-//       LEFT JOIN
-//         tags ON icon_tags.tag_id = tags.id
-//       WHERE
-//         icon_variants.weight = 'filled'
-//       GROUP BY
-//         icons.id,
-//         icons.name,
-//         categories.name,
-//         icon_variants.svg;`;
-
-//       return data;
-//     } catch (error) {
-//       console.error('Database Error:', error);
-//       throw new Error('Failed to fetch icon data.');
-//     }
-// }
 
 export async function fetchCategoryList() {
   try {
@@ -78,7 +45,7 @@ export async function fetchCategoryList() {
     throw new Error('Failed to fetch icon data.');
   }
 }
-export async function fetchIconsByCategory(slug: string) {
+export async function fetchIconsByCategory(slug: string, weight: string) {
   try {
     const data = await sql<IconWithSvg[]>`SELECT
       icons.id AS icon_id,
@@ -92,7 +59,7 @@ export async function fetchIconsByCategory(slug: string) {
     JOIN
       categories ON icons.category_id = categories.id
     WHERE
-      icon_variants.weight = 'filled'
+      icon_variants.weight = ${weight}
       AND categories.slug = ${slug};`;
 
     return data;
@@ -119,26 +86,6 @@ export async function fetchCategoryNameBySlug(slug: string) {
     throw new Error('Failed to fetch icon data.');
   }
 }
-// export async function fetchInvoicesPages(query: string) {
-//   try {
-//     const data = await sql`SELECT COUNT(*)
-//     FROM invoices
-//     JOIN customers ON invoices.customer_id = customers.id
-//     WHERE
-//       customers.name ILIKE ${`%${query}%`} OR
-//       customers.email ILIKE ${`%${query}%`} OR
-//       invoices.amount::text ILIKE ${`%${query}%`} OR
-//       invoices.date::text ILIKE ${`%${query}%`} OR
-//       invoices.status ILIKE ${`%${query}%`}
-//   `;
-
-//     const totalPages = Math.ceil(Number(data[0].count) / ITEMS_PER_PAGE);
-//     return totalPages;
-//   } catch (error) {
-//     console.error('Database Error:', error);
-//     throw new Error('Failed to fetch total number of invoices.');
-//   }
-// }
 
 export async function fetchTagList() {
   try {
@@ -160,7 +107,7 @@ export async function fetchTagList() {
     throw new Error('Failed to fetch icon data.');
   }
 }
-export async function fetchIconsByTag(slug: string) {
+export async function fetchIconsByTag(slug: string, weight: string) {
   try {
     const data = await sql<IconWithSvg[]>`SELECT
       icons.id AS icon_id,
@@ -176,7 +123,7 @@ export async function fetchIconsByTag(slug: string) {
     JOIN
       tags ON icon_tags.tag_id = tags.id
     WHERE
-      icon_variants.weight = 'filled'
+      icon_variants.weight =  ${weight}
       AND tags.slug = ${slug};`;
 
     return data;
@@ -198,6 +145,40 @@ export async function fetchTagNameBySlug(slug: string) {
     const tagName = data[0]?.name || slug;
 
     return tagName;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch icon data.');
+  }
+}
+export async function fetchIconDetailData(id: string, weight: string) {
+  try {
+    const data = await sql<IconDetail[]>`SELECT
+      icons.id AS icon_id,
+      icons.slug,
+      icons.name,
+      categories.name AS category_name,
+      ARRAY_AGG(DISTINCT tags.name) AS tag_names,
+      icon_variants.svg
+    FROM
+      icons
+    JOIN
+      categories ON icons.category_id = categories.id
+    JOIN
+      icon_variants ON icons.id = icon_variants.icon_id
+    JOIN
+      icon_tags ON icons.id = icon_tags.icon_id
+    JOIN
+      tags ON icon_tags.tag_id = tags.id
+    WHERE
+      icons.id = ${id}
+      AND icon_variants.weight = ${weight}
+    GROUP BY
+      icons.id,
+      icons.name,
+      categories.name,
+      icon_variants.svg;`;
+
+    return data;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch icon data.');
