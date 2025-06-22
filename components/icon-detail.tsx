@@ -18,7 +18,7 @@ export function IconDetail({ icon }: IconDetailProps) {
   const [error, setError] = useState<string | null>(null);
   const [svgContent, setSvgContent] = useState<string | null>(null);
   const [copyButtonText, setCopyButtonText] = useState("Copy");
-  const [iconSize, setIconSize] = useState(100);  // デフォルトサイズを100に設定
+  const [iconSize, setIconSize] = useState(300);
 
   const [recentColors, setRecentColors] = useState<string[]>(() => {
     // ブラウザ環境でのみローカルストレージを使用して色を設定
@@ -136,7 +136,7 @@ export function IconDetail({ icon }: IconDetailProps) {
     // 幅と高さを設定
     svg.setAttribute('width', iconSize.toString());
     svg.setAttribute('height', iconSize.toString());
-    
+
     // コピーライトコメントを追加
     const comment = doc.createComment('Icon Room by @iconroom - Copyright 2025 Icon Room. All rights reserved.');
     svg.insertBefore(comment, svg.firstChild);
@@ -294,22 +294,7 @@ export function IconDetail({ icon }: IconDetailProps) {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full w-full bg-secondary rounded-lg">
-                    <div
-                      className="w-full h-full flex items-center justify-center"
-                      dangerouslySetInnerHTML={{
-                        __html: updatedSvgContent ? 
-                          updatedSvgContent
-                            // .replace(/viewBox="[^"]*"/, `viewBox="-50 -50 ${icon["svg-image"].width+100} ${icon["svg-image"].height+100}" preserveAspectRatio="xMidYMid meet"`) : 
-                          :"",
-                      }}
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                    />
+                    <div className="flex w-full justify-center items-center h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 " dangerouslySetInnerHTML={{ __html: updatedSvgContent }} />
                   </div>
                 )}
               </div>
