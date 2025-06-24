@@ -21,10 +21,10 @@ export default function RootLayout({
     <div className="flex min-h-screen flex-col">
       <Header />
       <div className="flex min-h-screen mt-16">
-        <div className="flex flex-1 w-64 bg-[#EEE]">
+        <div className="flex w-64 bg-[#EEE]">
           <Sidenav />
         </div>
-        <main className="flex-1 p-4">
+        <main className="w-full p-4">
           {children}
         </main>
       </div>

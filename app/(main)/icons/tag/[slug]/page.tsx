@@ -25,9 +25,7 @@ export default async function TagPage({ params }: { params: { slug: string } }) 
       {[filled, bold, thin].length > 0 ? (
         <>
           <h1>{tagName} のアイコン一覧</h1>
-          <div className="w-screen border-r p-4">
-            <IconList iconsByWeight={{ filled, bold, thin }} />
-          </div>
+          <IconList iconsByWeight={{ filled, bold, thin }} />
         </>
       ) : (
         <div className="flex flex-col items-center justify-center p-8">

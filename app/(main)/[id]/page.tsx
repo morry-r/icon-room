@@ -7,7 +7,6 @@ export default async function IconPage({ params }: { params: { id: string } }) {
 
   return (
     <div>
-      <h1>{params.id} Icons</h1>
       <IconDetail icon={iconDetail} />
     </div>
   )

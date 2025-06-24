@@ -131,11 +131,11 @@ export function IconDetail({ icon }: IconDetailProps) {
     const svg = doc.documentElement;
     
     // viewBoxの形式を固定
-    svg.setAttribute('viewBox', '0 0 500 500');
+    // svg.setAttribute('viewBox', '0 0 500 500');
     
     // 幅と高さを設定
-    svg.setAttribute('width', iconSize.toString());
-    svg.setAttribute('height', iconSize.toString());
+    // svg.setAttribute('width', iconSize.toString());
+    // svg.setAttribute('height', iconSize.toString());
 
     // コピーライトコメントを追加
     const comment = doc.createComment('Icon Room by @iconroom - Copyright 2025 Icon Room. All rights reserved.');
@@ -294,7 +294,7 @@ export function IconDetail({ icon }: IconDetailProps) {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-full w-full bg-secondary rounded-lg">
-                    <div className="flex w-full justify-center items-center h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 " dangerouslySetInnerHTML={{ __html: updatedSvgContent }} />
+                    <div className="flex justify-center items-center h-16 w-[70%]" dangerouslySetInnerHTML={{ __html: updatedSvgContent }} />
                   </div>
                 )}
               </div>
