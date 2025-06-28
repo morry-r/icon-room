@@ -54,3 +54,13 @@ export interface Tag {
 export type TagName = {
   name: string;
 }
+
+export type AdminIconDetail = {
+  icon_id: string; 
+  slug: string;
+  name: string;
+  created_at: string;
+  category_name: string | null;
+  tag_names: string[] | null;
+  svg: string;
+};

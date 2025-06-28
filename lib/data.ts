@@ -1,5 +1,5 @@
 import postgres from 'postgres';
-import { IconWithSvg, Category, CategoryName, Tag, TagName, IconDetail } from './types';
+import { IconWithSvg, Category, CategoryName, Tag, TagName, IconDetail, AdminIconDetail } from './types';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -182,5 +182,42 @@ export async function fetchIconDetailData(id: string, weight: string) {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch icon data.');
+  }
+}
+
+export async function fetchAdminIconList() {
+  try {
+    const data = await sql<AdminIconDetail[]>`SELECT
+      icons.id AS icon_id,
+      icons.slug,
+      icons.name,
+      icons.created_at,
+      categories.name AS category_name,
+      ARRAY_AGG(DISTINCT tags.name) AS tag_names,
+      icon_variants.svg
+    FROM
+      icons
+    LEFT JOIN
+      categories ON icons.category_id = categories.id
+    LEFT JOIN
+      icon_variants ON icons.id = icon_variants.icon_id 
+      AND icon_variants.weight = 'filled'
+    LEFT JOIN
+      icon_tags ON icons.id = icon_tags.icon_id
+    LEFT JOIN
+      tags ON icon_tags.tag_id = tags.id
+    GROUP BY
+      icons.id,
+      icons.name,
+      icons.created_at,
+      categories.name,
+      icon_variants.svg
+    ORDER BY
+      icons.created_at DESC;`;
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch admin icon data.');
   }
 }
