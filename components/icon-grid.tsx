@@ -1,10 +1,10 @@
 "use client";
 
-import { IconWithSvg, Category } from "@/lib/types";
+import { IconList, Category } from "@/lib/types";
 import Link from "next/link";
 
 interface IconGridProps {
-  icons: IconWithSvg[];
+  icons: IconList[];
 }
 
 

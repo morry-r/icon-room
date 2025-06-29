@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { IconWithSvg } from "@/lib/types";
+import type { IconList } from "@/lib/types";
 import { IconGrid } from "@/components/icon-grid";
 
 
 type IconTabProps = {
   iconsByWeight: {
-    filled: IconWithSvg[]
-    bold: IconWithSvg[]
-    thin: IconWithSvg[]
+    filled: IconList[]
+    bold: IconList[]
+    thin: IconList[]
   }
 }
 

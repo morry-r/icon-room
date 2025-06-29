@@ -1,4 +1,4 @@
-import { IconList } from "@/components/ui/icon-list";
+import { IconList } from "@/components/icon-list";
 import { fetchIconListData } from "@/lib/data";
 import { Metadata } from 'next'
 

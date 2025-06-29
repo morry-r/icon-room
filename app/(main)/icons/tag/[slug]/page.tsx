@@ -1,7 +1,7 @@
 // app/(main)/icons/category/[slug]/page.tsx
 import { Metadata } from 'next'
 import { fetchIconsByTag, fetchTagNameBySlug } from '@/lib/data'
-import { IconList } from "@/components/ui/icon-list";
+import { IconList } from "@/components/icon-list";
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const { tagName } = await getTagName(params.slug)

@@ -1,11 +1,11 @@
 import postgres from 'postgres';
-import { IconWithSvg, Category, CategoryName, Tag, TagName, IconDetail, AdminIconDetail } from './types';
+import { IconList, Category, CategoryName, Tag, TagName, IconDetail, AdminIconList, AdminIconEdit } from './types';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 export async function fetchIconListData(weight: string) {
   try {
-    const data = await sql<IconWithSvg[]>`SELECT
+    const data = await sql<IconList[]>`SELECT
       icons.id AS icon_id,
       icons.slug,
       icons.name,
@@ -47,7 +47,7 @@ export async function fetchCategoryList() {
 }
 export async function fetchIconsByCategory(slug: string, weight: string) {
   try {
-    const data = await sql<IconWithSvg[]>`SELECT
+    const data = await sql<IconList[]>`SELECT
       icons.id AS icon_id,
       icons.slug,
       icons.name,
@@ -109,7 +109,7 @@ export async function fetchTagList() {
 }
 export async function fetchIconsByTag(slug: string, weight: string) {
   try {
-    const data = await sql<IconWithSvg[]>`SELECT
+    const data = await sql<IconList[]>`SELECT
       icons.id AS icon_id,
       icons.slug,
       icons.name,
@@ -187,7 +187,7 @@ export async function fetchIconDetailData(id: string, weight: string) {
 
 export async function fetchAdminIconList() {
   try {
-    const data = await sql<AdminIconDetail[]>`SELECT
+    const data = await sql<AdminIconList[]>`SELECT
       icons.id AS icon_id,
       icons.slug,
       icons.name,
@@ -214,6 +214,42 @@ export async function fetchAdminIconList() {
       icon_variants.svg
     ORDER BY
       icons.created_at DESC;`;
+
+    return data;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch admin icon data.');
+  }
+}
+
+export async function fetchAdminIconEditData(id: string) {
+  try {
+    const data = await sql<AdminIconEdit[]>`SELECT
+      icons.id AS icon_id,
+      icons.slug,
+      icons.name,
+      categories.name AS category_name,
+      ARRAY_AGG(DISTINCT tags.name) AS tag_names,
+      icon_variants.weight,
+      icon_variants.svg
+    FROM
+      icons
+    JOIN
+      categories ON icons.category_id = categories.id
+    JOIN
+      icon_variants ON icons.id = icon_variants.icon_id
+    JOIN
+      icon_tags ON icons.id = icon_tags.icon_id
+    JOIN
+      tags ON icon_tags.tag_id = tags.id
+    WHERE
+      icons.id = ${id}
+    GROUP BY
+      icons.id,
+      icons.name,
+      categories.name,
+      icon_variants.weight,
+      icon_variants.svg;`;
 
     return data;
   } catch (error) {

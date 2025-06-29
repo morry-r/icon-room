@@ -16,7 +16,7 @@ export type IconVariant = {
   created_at: string;
 }
 
-export type IconWithSvg = {
+export type IconList = {
   icon_id: string; 
   slug: string;
   name: string;
@@ -55,12 +55,23 @@ export type TagName = {
   name: string;
 }
 
-export type AdminIconDetail = {
+export type AdminIconList = {
   icon_id: string; 
   slug: string;
   name: string;
   created_at: string;
   category_name: string | null;
   tag_names: string[] | null;
+  svg: string;
+};
+
+export type AdminIconEdit = {
+  icon_id: string; 
+  slug: string;
+  name: string;
+  created_at: string;
+  category_name: string | null;
+  tag_names: string[] | null;
+  weight: string;
   svg: string;
 };
