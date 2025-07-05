@@ -29,7 +29,7 @@ export function IconGrid({ icons }: IconGridProps) {
               }}
             >
               {icon.svg && (
-                  <div className="flex justify-center items-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 " dangerouslySetInnerHTML={{ __html: icon.svg }} />
+                  <div className="icon-svg flex justify-center items-center w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 " dangerouslySetInnerHTML={{ __html: icon.svg }} />
               )}
             </div>
             <p className="mt-2 text-sm text-center text-gray-600 group-hover:text-gray-900">

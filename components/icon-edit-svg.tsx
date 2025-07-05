@@ -12,6 +12,7 @@ export function IconEditSvg({ svgCode, weight }: { svgCode: string; weight: stri
       <div className="flex-1">
         <label className="block text-sm font-medium mb-2">SVGコード ({weight})</label>
         <Textarea
+          name={`svg_${weight}`} 
           value={currentSvgCode}
           onChange={(e) => setCurrentSvgCode(e.target.value)}
           className="h-36 resize-none"
