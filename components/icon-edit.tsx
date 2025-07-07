@@ -1,6 +1,6 @@
 'use client';
 
-import { AdminIconEdit } from '@/lib/types';
+import { AdminIconEdit, Category, Tag } from '@/lib/types';
 import { IconEditSvg } from "@/components/icon-edit-svg";
 import { IconEditName } from "@/components/icon-edit-name";
 import Link from 'next/link';
@@ -8,9 +8,13 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
 export default function EditIconForm({
-    iconEditData
+    iconEditData,
+    categoryList,
+    tagList
 }: {
     iconEditData: AdminIconEdit[];
+    categoryList: Category[];
+    tagList: Tag[];
 }) {
     //   const updateSvgWithId = updateIconSvg.bind(null, iconEditData[0].icon_id);
     //   const [state, formAction] = useActionState(updateSvgWithId, initialState);
@@ -27,10 +31,32 @@ export default function EditIconForm({
     };
     const [state, setState] = useState(initialState)
 
+    // タグ選択用のstateを追加
+    const [selectedTags, setSelectedTags] = useState<string[]>(
+        iconEditData[0].tag_names || []
+    );
+
+    // タグを追加する関数
+    const addTag = (tagName: string) => {
+        if (!selectedTags.includes(tagName)) {
+            setSelectedTags([...selectedTags, tagName]);
+        }
+    };
+
+    // タグを削除する関数
+    const removeTag = (tagName: string) => {
+        setSelectedTags(selectedTags.filter(tag => tag !== tagName));
+    };
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         console.log('フォームが送信されました');
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
+        
+        // 選択されたタグをフォームデータに追加
+        selectedTags.forEach(tag => {
+            formData.append('tags[]', tag);
+        });
         
         console.log('送信するデータ:', {
           name: formData.get('name'),
@@ -46,6 +72,11 @@ export default function EditIconForm({
         
         const result = await res.json()
         setState(result)
+        
+        // 成功時にページをリロード
+        if (result.message) {
+          window.location.reload();
+        }
     }
 
     const filledIcon = iconEditData.find(icon => icon.weight === 'filled')
@@ -57,23 +88,80 @@ export default function EditIconForm({
             <div className="flex h-screen w-full">
                 <div className="flex flex-col w-full p-6">
                     <IconEditName initialName={iconEditData[0].name} />
+                    <div>
+                        カテゴリ
+                        <select name="category" id="category">
+                            {categoryList.map((category) => (
+                                <option 
+                                    key={category.id} 
+                                    value={category.id}
+                                    selected={category.name === iconEditData[0].category_name}
+                                >
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        タグ
+                        <div className="flex gap-2 mb-2">
+                            <select 
+                                onChange={(e) => {
+                                    if (e.target.value) {
+                                        addTag(e.target.value);
+                                        e.target.value = ''; // 選択をリセット
+                                    }
+                                }}
+                                className="border rounded px-2 py-1"
+                            >
+                                <option value="">タグを選択</option>
+                                {tagList
+                                    .filter(tag => !selectedTags.includes(tag.name))
+                                    .map((tag) => (
+                                        <option key={tag.id} value={tag.name}>
+                                            {tag.name}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+                        
+                        {/* 選択されたタグの表示 */}
+                        <div className="flex flex-wrap gap-2">
+                            {selectedTags.map((tagName) => (
+                                <span 
+                                    key={tagName}
+                                    className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm flex items-center gap-1"
+                                >
+                                    {tagName}
+                                    <button
+                                        type="button"
+                                        onClick={() => removeTag(tagName)}
+                                        className="text-blue-600 hover:text-blue-800"
+                                    >
+                                        ×
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    </div>
                     <div className="flex flex-col w-full">
-                    <div className="flex flex-col w-full h-52">
-                        <h4>塗りアイコン</h4>
-                        <IconEditSvg key="filled" svgCode={filledIcon?.svg || ''} weight={filledIcon?.weight || ''} />
-                    </div>
-                    <div className="flex flex-col w-full h-52">
-                        <h4>太めアイコン</h4>
-                        <IconEditSvg key="bold" svgCode={boldIcon?.svg || ''} weight={boldIcon?.weight || ''} />
-                    </div>
-                    <div className="flex flex-col w-full h-52">
-                        <h4>細めアイコン</h4>
-                        <IconEditSvg key="thin" svgCode={thinIcon?.svg || ''} weight={thinIcon?.weight || ''} />
-                    </div>
+                        <div className="flex flex-col w-full h-52">
+                            <h4>塗りアイコン</h4>
+                            <IconEditSvg key="filled" svgCode={filledIcon?.svg || ''} weight={filledIcon?.weight || ''} />
+                        </div>
+                        <div className="flex flex-col w-full h-52">
+                            <h4>太めアイコン</h4>
+                            <IconEditSvg key="bold" svgCode={boldIcon?.svg || ''} weight={boldIcon?.weight || ''} />
+                        </div>
+                        <div className="flex flex-col w-full h-52">
+                            <h4>細めアイコン</h4>
+                            <IconEditSvg key="thin" svgCode={thinIcon?.svg || ''} weight={thinIcon?.weight || ''} />
+                        </div>
                     </div>
                 </div>
-                <Button type="submit" className="flex flex-col w-64 bg-gray-100">
-                    保存ボタン
+                <Button type="submit" className="flex flex-col w-64">
+                    保存
                 </Button>
                 {state.message && <p className="text-green-600 mt-4">{state.message}</p>}
                 {Object.entries(state.errors).map(([key, msg]) => (

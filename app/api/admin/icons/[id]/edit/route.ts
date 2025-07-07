@@ -11,6 +11,8 @@ export async function POST(
   const formData = await req.formData();
 
   const name = formData.get('name') as string | null;
+  const category = formData.get('category') as string | null;
+  const tags = formData.getAll('tags[]') as string[];
   const svg_filled = formData.get('svg_filled') as string | null;
   const svg_bold = formData.get('svg_bold') as string | null;
   const svg_thin = formData.get('svg_thin') as string | null;
@@ -26,8 +28,38 @@ export async function POST(
 
   // DB更新
   try {
-    // アイコン名を更新
-    await supabase.from('icons').update({ name }).eq('id', iconId);
+    // アイコン名とカテゴリを更新
+    const updateData: any = { name };
+    if (category) {
+      updateData.category_id = category;
+    }
+    await supabase.from('icons').update(updateData).eq('id', iconId);
+
+    // タグを更新
+    if (tags.length > 0) {
+      // 既存のタグを削除
+      await supabase.from('icon_tags').delete().eq('icon_id', iconId);
+      
+      // 新しいタグを追加
+      for (const tagName of tags) {
+        // タグ名からtag_idを取得
+        const { data: tagData } = await supabase
+          .from('tags')
+          .select('id')
+          .eq('name', tagName)
+          .single();
+        
+        if (tagData) {
+          await supabase.from('icon_tags').insert({
+            icon_id: iconId,
+            tag_id: tagData.id
+          });
+        }
+      }
+    } else {
+      // タグが空の場合は既存のタグを全て削除
+      await supabase.from('icon_tags').delete().eq('icon_id', iconId);
+    }
 
     // SVGごとに更新（あれば）
     if (svg_filled) {

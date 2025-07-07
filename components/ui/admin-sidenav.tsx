@@ -22,7 +22,31 @@ export default async function AdminSidenav() {
             >
               素材一覧
             </Link>
+            <Link
+              href={`/admin/categories`}
+              className={clsx(
+                'flex h-10 grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-gray-100 md:flex-none md:justify-start md:p-2 md:px-3',
+                {
+                  'bg-sky-100 text-blue-600': pathname === `/admin/categories`,
+                }
+              )}
+            >
+              カテゴリ管理
+            </Link>
+            <Link
+              href={`/admin/tags`}
+              className={clsx(
+                'flex h-10 grow items-center justify-center gap-2 rounded-md p-3 text-sm font-medium hover:bg-gray-100 md:flex-none md:justify-start md:p-2 md:px-3',
+                {
+                  'bg-sky-100 text-blue-600': pathname === `/admin/tags`,
+                }
+              )}
+            >
+              タグ管理
+            </Link>
+          
       </div>
+      
     </div>
   ); 
 } 
