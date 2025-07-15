@@ -7,7 +7,6 @@ export async function POST(
 ) {
   
   const supabase = await createClient();
-  const iconId = params.id;
   const formData = await req.formData();
 
   const name = formData.get('name') as string | null;
@@ -31,17 +30,26 @@ export async function POST(
   // DB更新
   try {
     // アイコン名とカテゴリを更新
-    const updateData: any = { name, slug };
+    const insertData: any = { name, slug };
     if (category) {
-      updateData.category_id = category;
+      insertData.category_id = category;
     }
-    await supabase.from('icons').update(updateData).eq('id', iconId);
+    const { data, error } = await supabase
+      .from('icons')
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase Error:', error);
+      return NextResponse.json(
+        { error: 'Failed to create tag' },
+        { status: 500 }
+      );
+    }
 
     // タグを更新
     if (tags.length > 0) {
-      // 既存のタグを削除
-      await supabase.from('icon_tags').delete().eq('icon_id', iconId);
-      
       // 新しいタグを追加
       for (const tagName of tags) {
         // タグ名からtag_idを取得
@@ -53,25 +61,35 @@ export async function POST(
         
         if (tagData) {
           await supabase.from('icon_tags').insert({
-            icon_id: iconId,
+            icon_id: data.id,
             tag_id: tagData.id
           });
         }
       }
-    } else {
-      // タグが空の場合は既存のタグを全て削除
-      await supabase.from('icon_tags').delete().eq('icon_id', iconId);
     }
+    
 
     // SVGごとに更新（あれば）
     if (svg_filled) {
-      await supabase.from('icon_variants').update({ svg: svg_filled }).match({ icon_id: iconId, weight: 'filled' });
+      const svgInsertData: any = { icon_id: data.id, weight: 'filled', svg: svg_filled };
+      await supabase.from('icon_variants').insert(svgInsertData).select().single();
+    } else {
+      const svgInsertData: any = { icon_id: data.id, weight: 'filled', svg: '' };
+      await supabase.from('icon_variants').insert(svgInsertData).select().single();
     }
     if (svg_bold) {
-      await supabase.from('icon_variants').update({ svg: svg_bold }).match({ icon_id: iconId, weight: 'bold' });
+      const svgInsertData: any = { icon_id: data.id, weight: 'bold', svg: svg_bold };
+      await supabase.from('icon_variants').insert(svgInsertData).select().single();
+    } else {
+      const svgInsertData: any = { icon_id: data.id, weight: 'bold', svg: '' };
+      await supabase.from('icon_variants').insert(svgInsertData).select().single();
     }
     if (svg_thin) {
-      await supabase.from('icon_variants').update({ svg: svg_thin }).match({ icon_id: iconId, weight: 'thin' });
+      const svgInsertData: any = { icon_id: data.id, weight: 'thin', svg: svg_thin };
+      await supabase.from('icon_variants').insert(svgInsertData).select().single();
+    } else {
+      const svgInsertData: any = { icon_id: data.id, weight: 'thin', svg: '' };
+      await supabase.from('icon_variants').insert(svgInsertData).select().single();
     }
 
     return NextResponse.json({ message: '保存しました', errors: {} });

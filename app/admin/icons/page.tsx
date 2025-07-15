@@ -19,6 +19,12 @@ export default async function AdminIcons() {
         <h1 className="text-2xl font-bold">アイコン一覧</h1>
         <p className="text-gray-600">全{icons.length}件のアイコン</p>
       </div>
+      <div className="flex justify-end mb-4">
+        <Link href="/admin/icons/new" className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+          新規追加
+        </Link>
+      </div>
+
       
       <div className="flex-1 overflow-auto">
         <Table className="border border-gray-400">

@@ -7,12 +7,10 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 
-export default function EditIconForm({
-    iconEditData,
+export default function IconCreateForm({
     categoryList,
     tagList
 }: {
-    iconEditData: AdminIconEdit[];
     categoryList: Category[];
     tagList: Tag[];
 }) {
@@ -33,7 +31,7 @@ export default function EditIconForm({
 
     // タグ選択用のstateを追加
     const [selectedTags, setSelectedTags] = useState<string[]>(
-        iconEditData[0].tag_names || []
+        []
     );
 
     // タグを追加する関数
@@ -65,7 +63,7 @@ export default function EditIconForm({
           svg_thin: formData.get('svg_thin')
         });
         
-        const res = await fetch(`/api/admin/icons/${iconEditData[0].icon_id}/edit`, {
+        const res = await fetch(`/api/admin/icons/new`, {
           method: 'POST',
           body: formData,
         })
@@ -78,16 +76,12 @@ export default function EditIconForm({
           window.location.reload();
         }
     }
-
-    const filledIcon = iconEditData.find(icon => icon.weight === 'filled')
-    const boldIcon = iconEditData.find(icon => icon.weight === 'bold')
-    const thinIcon = iconEditData.find(icon => icon.weight === 'thin')
     
     return (
         <form onSubmit={handleSubmit}>
-            <div className="flex h-screen w-full">
+            <div className="flex w-full">
                 <div className="flex flex-col w-full p-6">
-                    <IconEditName initialName={iconEditData[0].name} initialSlug={iconEditData[0].slug} />
+                    <IconEditName initialName={''} initialSlug={''} />
                     <div>
                         カテゴリ
                         <select name="category" id="category">
@@ -95,7 +89,7 @@ export default function EditIconForm({
                                 <option 
                                     key={category.id} 
                                     value={category.id}
-                                    selected={category.name === iconEditData[0].category_name}
+                                    selected={category.name === ''}
                                 >
                                     {category.name}
                                 </option>
@@ -148,15 +142,15 @@ export default function EditIconForm({
                     <div className="flex flex-col w-full">
                         <div className="flex flex-col w-full h-52">
                             <h4>塗りアイコン</h4>
-                            <IconEditSvg key="filled" svgCode={filledIcon?.svg || ''} weight={filledIcon?.weight || ''} />
+                            <IconEditSvg key="filled" svgCode={''} weight={'filled'} />
                         </div>
                         <div className="flex flex-col w-full h-52">
                             <h4>太めアイコン</h4>
-                            <IconEditSvg key="bold" svgCode={boldIcon?.svg || ''} weight={boldIcon?.weight || ''} />
+                            <IconEditSvg key="bold" svgCode={''} weight={'bold'} />
                         </div>
                         <div className="flex flex-col w-full h-52">
                             <h4>細めアイコン</h4>
-                            <IconEditSvg key="thin" svgCode={thinIcon?.svg || ''} weight={thinIcon?.weight || ''} />
+                            <IconEditSvg key="thin" svgCode={''} weight={'thin'} />
                         </div>
                     </div>
                 </div>
